@@ -1,4 +1,42 @@
 pdfdiff
 =======
 
-Command-line tool to inspect the difference between (the text in) two PDF files
+Command-line tool to inspect the difference between (the text in) two PDF files.
+
+
+Purpose and function
+--------------------
+
+`pdfdiff` relies on `pdftotext` to extract the plaintext from a PDF
+file.  However, small changes in the text between two PDF files can make
+a huge difference in the resulting extracted text. More often than not,
+the difference is so large that doing a `diff` on the output does not
+yield a sensible result.
+
+The main function of this program, `pdfdiff`, is to normalize the output
+of `pdftotext`, such that the result is suitable for diff viewing. To
+achieve this, it attempts to detect sentence endings to reformat
+paragraphs and lines.  Along the way, it removes some ligature encodings
+to give `diff` viewers an easier time. After this normalisation
+procedure, `diff` viewers commonly yield a substantially better
+comparison between the contents of the files.
+
+Note that if a single file is provided as input, `pdfdiff` will directly
+output the normalised text, enabling its use as a preprocessor for other
+tools.
+
+
+Caveats
+-------
+
+- `pdfdiff` ignores many elements of PDF files, such as figures. As a
+  result, if the (textual) difference between two files is empty, there
+  is no guarantee that the PDF files are identical.
+
+
+License
+-------
+
+Currently the `pdfdiff` sources are licensed under the GPL 2, as indicated
+in the source code. Contact Cas Cremers if you have any questions.
+
