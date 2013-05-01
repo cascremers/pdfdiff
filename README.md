@@ -7,6 +7,10 @@ Command-line tool to inspect the difference between (the text in) two PDF files.
 Purpose and function
 --------------------
 
+`pdfdiff` takes two PDF files as input files, and generates a textual
+diff between the two. It visualises this diff using the first
+diff-viewer it finds on the system.
+
 `pdfdiff` relies on `pdftotext` to extract the plaintext from a PDF
 file.  However, small changes in the text between two PDF files can make
 a huge difference in the resulting extracted text. More often than not,
