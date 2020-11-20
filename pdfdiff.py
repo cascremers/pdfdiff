@@ -26,7 +26,7 @@ Module dependencies
 """
 import sys
 import string
-import commands
+import subprocess
 import os.path
 import tempfile
 
@@ -55,7 +55,7 @@ diffViewers = [ \
 
 # pdftotext program with switches
 pdftotextProgram = "pdftotext"
-pdftotextOptions = "-nopgbrk"
+pdftotextOptions = "-nopgbrk -enc UTF-8"
 
 # Myname
 progName = "pdfdiff.py"
@@ -117,7 +117,7 @@ def is_command_available(prg):
     it will find "kdiff3 -a"
     """
     cmd = "which %s" % ((prg.split())[0])
-    (status,out) = commands.getstatusoutput(cmd)
+    status, out = subprocess.getstatusoutput(cmd)
     return (status == 0)
 
 
@@ -138,14 +138,14 @@ def apply_command_temp(prg,options,notfound,filename,prefix="",suffix=""):
 
     Returns (tempfileFilehandle,output) tuple.
     """
-    fout = tempfile.NamedTemporaryFile(suffix=suffix,prefix=prefix)
+    fout = tempfile.NamedTemporaryFile(mode='w+', suffix=suffix, prefix=prefix)
 
     if not is_command_available(prg):
-        print "Error: %s" % (notfound)
+        print("Error: %s" % notfound)
         sys.exit(1)
 
     cmd = "%s %s \"%s\" \"%s\"" % (prg,options,filename,fout.name)
-    output = commands.getoutput(cmd)
+    output = subprocess.getoutput(cmd)
     return (fout,output)
 
 
@@ -166,7 +166,7 @@ def get_filetype(filename):
         # On systems where we have 'file', this is a nice
         # and solid solution.
         cmd = "file --brief \"%s\"" % filename
-        output = commands.getoutput(cmd)
+        output = subprocess.getoutput(cmd)
         type = (output.split())[0].lower()
     else:
         # If we don't have 'file', we just take an educated
@@ -364,7 +364,7 @@ def normalize_anything(filename,fout=sys.stdout):
         elif filetype == "ps":
             fhandle = ps_to_pdf(filename,prefix=prefix)
         else:
-            print "Error: Don't know how to handle file type '%s'" % (filetype)
+            print("Error: Don't know how to handle file type '%s'" % filetype)
             sys.exit(1)
         if temphandle:
             temphandle.close()
@@ -386,7 +386,7 @@ def normalize_anything_tempfile(filename):
     Normalize anything with a wrapper for tempfile generation.
     """
     prefix = make_prefix(filename)
-    fout = tempfile.NamedTemporaryFile(suffix=".txt",prefix=prefix)
+    fout = tempfile.NamedTemporaryFile(mode="w+", suffix=".txt", prefix=prefix)
     normalize_anything(filename,fout)
     return fout
 
@@ -417,16 +417,16 @@ def view_diff(fnleft,fnright):
 
     prg = find_first(viewers)
 
-    if prg == None:
+    if prg is None:
         estr = "Error: Could not find a suitable diff viewer from the list %s" % (diffViewers)
-        print estr
+        print(estr)
         sys.exit(1)
 
     cmd = "%s \"%s\" \"%s\"" % (prg,fleft.name,fright.name)
-    out = commands.getoutput(cmd)
+    out = subprocess.getoutput(cmd)
     # Also print the result (e.g. for programs like diff that send
     # output to stdout)
-    print out
+    print(out)
 
     fleft.close()
     fright.close()
@@ -456,7 +456,7 @@ Switches:
         %s
        that starts with <prefix>.
 """ % (progVersion, ", ".join(get_viewer_list()))
-    print helpstr.replace("PRG",progName)
+    print(helpstr.replace("PRG", progName))
 
 
 #-------------------------------------------------------------------------
@@ -488,12 +488,13 @@ if __name__ == "__main__":
         elif optcmd in ["-d","--diffviewer"]:
             # Selecting diff viewer prefix
             if len(args) < 2:
-                print "Error: Diff viewer preference requires a string prefix argument"
+                print("Error: Diff viewer preference requires a string prefix argument")
                 sys.exit(1)
             diffViewerPrefix = args[1]
             if len(filter(lambda s:s.startswith(diffViewerPrefix),get_viewer_list())) == 0:
                 if not is_command_available(diffViewerPrefix):
-                    print "Error: program '%s' not found, and no viewer from the list %s starts with '%s'" % (diffViewerPrefix,get_viewer_list(),diffViewerPrefix)
+                    print("Error: program '%s' not found, and no viewer from the list %s starts with '%s'" %
+                          (diffViewerPrefix, get_viewer_list(), diffViewerPrefix))
                     sys.exit(1)
             args = args[2:]
 
@@ -506,7 +507,7 @@ if __name__ == "__main__":
                 view_diff(args[0],args[1])
                 sys.exit(0)
             else:
-                print "Error: I don't know what to do with more than two files"
+                print("Error: I don't know what to do with more than two files")
                 sys.exit(1)
 
 # vim: set ts=4 sw=4 et fileencoding=utf-8 list lcs=tab\:>-:
