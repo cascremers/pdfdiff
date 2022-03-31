@@ -1,9 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # This Python file uses the following encoding: latin-1
 """
 pdfdiff.py : inspect the difference between two PDF files.
 
-Copyright (C) 2007-2013 Cas Cremers
+Copyright (C) 2007-2022 Cas Cremers
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -59,7 +59,7 @@ pdftotextOptions = "-nopgbrk -enc UTF-8"
 
 # Myname
 progName = "pdfdiff.py"
-progVersion = "0.92"
+progVersion = "0.93"
 
 # Define what a long sentence is.
 # When a sentence is longer than this, any punctuations count as sentence
@@ -491,7 +491,7 @@ if __name__ == "__main__":
                 print("Error: Diff viewer preference requires a string prefix argument")
                 sys.exit(1)
             diffViewerPrefix = args[1]
-            if len(filter(lambda s:s.startswith(diffViewerPrefix),get_viewer_list())) == 0:
+            if len(list(filter(lambda s:s.startswith(diffViewerPrefix),get_viewer_list()))) == 0:
                 if not is_command_available(diffViewerPrefix):
                     print("Error: program '%s' not found, and no viewer from the list %s starts with '%s'" %
                           (diffViewerPrefix, get_viewer_list(), diffViewerPrefix))
